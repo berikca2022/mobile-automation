@@ -1,6 +1,7 @@
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -62,7 +63,7 @@ public class FirstTest {
     }
 
     @Test
-    public void testCancelSearch (){
+    public void testCancelSearch() {
         waitForElementAndClick(
                 By.xpath("//*[contains(@text, 'SKIP')]"),
                 "Cannot find 'SKIP' button",
@@ -80,17 +81,57 @@ public class FirstTest {
                 15
         );
 
-        waitForElementAndClick(
-                By.id("search_close_btn"),
-                "Cannot find 'Close 'X' ' button",
+        waitForElementAndClear(
+                By.id("search_src_text"),
+                "Cannot clear the field",
                 5
-
         );
+//        waitForElementAndClick(
+//                By.id("search_close_btn"),
+//                "Cannot find 'Close 'X' ' button",
+//                5
+//
+//        );
 
         waitForElementNotPresent(
                 By.id("search_close_btn"),
                 "'Close 'X'' button is present",
                 5);
+    }
+
+    @Test
+    public void testCompareArticleTitle(){
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text, 'SKIP')]"),
+                "Cannot find 'SKIP' button",
+                5);
+
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text, 'Search Wikipedia')]"),
+                "Cannot find 'Search field' button",
+                5);
+
+        waitForElementAndSendKeys(
+                By.id("search_src_text"),
+                "Java",
+                "Cannot find input field",
+                15);
+
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text, 'Object-oriented programming language')]"),
+                "Cannot find 'Object-oriented programming language' text",
+                5);
+        WebElement title_name_element =  waitForElementPresent(
+                By.xpath("//*[contains(@text, 'Java (programming language)')]"),
+                "Cannot find 'Java (programming language)' text",
+                15);
+
+        String article_title = title_name_element.getAttribute("text");
+
+        Assert.assertEquals(
+                "title does not match",
+                "Java (programming language)",
+                article_title);
     }
 
     private WebElement waitForElementPresent(By by, String error_message, long timeoutInSeconds) {
@@ -111,9 +152,15 @@ public class FirstTest {
         return element;
     }
 
-    private boolean waitForElementNotPresent(By by, String error_message, long timeoutInSeconds){
+    private boolean waitForElementNotPresent(By by, String error_message, long timeoutInSeconds) {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
         wait.withMessage(error_message + "\n");
         return wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
-    };
+    }
+
+    private WebElement waitForElementAndClear(By by, String error_message, long timeoutInSeconds) {
+        WebElement element = waitForElementPresent(by, error_message, timeoutInSeconds);
+        element.clear();
+        return element;
+    }
 }
