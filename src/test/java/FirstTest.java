@@ -31,47 +31,89 @@ public class FirstTest {
     }
 
     @After
-    public void tearDown(){
+    public void tearDown() {
         driver.quit();
     }
 
     @Test
-    public void firstTest() throws InterruptedException {
-        WebElement skip_button = driver.findElementByXPath("//*[contains(@text, 'SKIP')]");
-        skip_button.click();
+    public void firstTest() {
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text, 'SKIP')]"),
+                "Cannot find 'SKIP' button",
+                5);
 
-        WebElement search_field = driver.findElementByXPath("//*[contains(@text, 'Search Wikipedia')]");
-        search_field.click();
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text, 'Search Wikipedia')]"),
+                "Cannot find 'Search field' button",
+                5
+        );
 
-        WebElement element_to_enter_search_line = waitElementPresentById(
-                "search_src_text",
-                "Cannot find input field");
-        element_to_enter_search_line.sendKeys("Java ");
-        waitElementPresentByXpath(
-                "//*[contains(@text, 'Object-oriented programming language')]",
+        waitForElementAndSendKeys(
+                By.id("search_src_text"),
+                "Java",
+                "Cannot find input field",
+                15
+        );
+
+        waitForElementPresent(
+                By.xpath("//*[contains(@text, 'Object-oriented programming language')]"),
                 "Cannot find 'Object-oriented programming language' topic by searching 'Java' ",
                 20);
     }
 
-    private WebElement waitElementPresentById(String id, String error_message, long timeoutInSeconds) {
+    @Test
+    public void testCancelSearch (){
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text, 'SKIP')]"),
+                "Cannot find 'SKIP' button",
+                5);
+
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text, 'Search Wikipedia')]"),
+                "Cannot find 'Search field' button",
+                5);
+
+        waitForElementAndSendKeys(
+                By.id("search_src_text"),
+                "Java",
+                "Cannot find input field",
+                15
+        );
+
+        waitForElementAndClick(
+                By.id("search_close_btn"),
+                "Cannot find 'Close 'X' ' button",
+                5
+
+        );
+
+        waitForElementNotPresent(
+                By.id("search_close_btn"),
+                "'Close 'X'' button is present",
+                5);
+    }
+
+    private WebElement waitForElementPresent(By by, String error_message, long timeoutInSeconds) {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
         wait.withMessage(error_message + "\n");
-        By by = By.id(id);
         return wait.until(ExpectedConditions.presenceOfElementLocated(by));
     }
 
-    private WebElement waitElementPresentById(String id, String error_message) {
-        return waitElementPresentById(id, error_message, 5);
+    private WebElement waitForElementAndClick(By by, String error_message, long timeoutInSeconds) {
+        WebElement element = waitForElementPresent(by, error_message, timeoutInSeconds);
+        element.click();
+        return element;
     }
 
-    private WebElement waitElementPresentByXpath(String xpath, String error_message, long timeoutInSeconds) {
+    private WebElement waitForElementAndSendKeys(By by, String value, String error_message, long timeoutInSeconds) {
+        WebElement element = waitForElementPresent(by, error_message, timeoutInSeconds);
+        element.sendKeys(value);
+        return element;
+    }
+
+    private boolean waitForElementNotPresent(By by, String error_message, long timeoutInSeconds){
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
         wait.withMessage(error_message + "\n");
-        By by = By.xpath(xpath);
-        return wait.until(ExpectedConditions.presenceOfElementLocated(by));
-    }
-
-    private WebElement waitElementPresentByXpath(String xpath, String error_message) {
-        return waitElementPresentById(xpath, error_message, 5);
-    }
+        return wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
+    };
 }
