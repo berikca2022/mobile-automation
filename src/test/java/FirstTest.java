@@ -225,14 +225,15 @@ public class FirstTest {
                 "Cannot find 'Saved' button",
                 5);
 
-        waitForElementAndClick(By.xpath("//*[contains(@text, 'Learning Programming')]"),
+        String name_of_folder = "Learning Programming";
+        waitForElementAndClick(By.xpath("//*[contains(@text, '" + name_of_folder + "')]"),
                 "Cannot find 'Learning Programming' list",
                 5);
 
-        swipeElementToLeft(By.xpath("//*[contains(@text, 'Learning Programming')]"),
+        swipeElementToLeft(By.xpath("//*[contains(@text, '" + name_of_folder + "')]"),
                 "Cannot find 'Learning Programming' topic");
 
-        waitForElementNotPresent( By.xpath("//*[contains(@text, 'Java (programming language)')]"),
+        waitForElementNotPresent(By.xpath("//*[@text, 'Java (programming language)']"),
                 "Cannot delete saved article",
                 5);
 
@@ -301,7 +302,10 @@ public class FirstTest {
 
     protected void swipeElementToLeft(By by, String error_message){
 
-        WebElement element = waitForElementPresent (by, error_message, 5);
+        WebElement element = waitForElementPresent (
+                by,
+                error_message,
+                10);
         int left_x = element.getLocation().getX();
         int right_x = left_x + element.getSize().getWidth();
         int upper_y = element.getLocation().getY();
@@ -311,7 +315,7 @@ public class FirstTest {
         TouchAction action = new TouchAction(driver);
         action
                 .press(right_x, middle_y)
-                .waitAction(150)
+                .waitAction(5000)
                 .moveTo(left_x, middle_y)
                 .release()
                 .perform();
