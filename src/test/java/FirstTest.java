@@ -170,6 +170,74 @@ public class FirstTest {
 
     }
 
+    @Test
+    public void saveFirstArticleToMyList(){
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text, 'SKIP')]"),
+                "Cannot find 'SKIP' button",
+                5);
+
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text, 'Search Wikipedia')]"),
+                "Cannot find 'Search field' button",
+                5);
+
+        waitForElementAndSendKeys(
+                By.id("search_src_text"),
+                "Java",
+                "Cannot find input field",
+                15);
+
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text, 'Object-oriented programming language')]"),
+                "Cannot find 'Object-oriented programming language' text",
+                5);
+        waitForElementPresent(
+                By.xpath("//*[contains(@text, 'Java (programming language)')]"),
+                "Cannot find 'Java (programming language)' text",
+                15);
+
+        waitForElementAndClick(By.xpath("//android.widget.TextView[@content-desc='Save']"),
+                "Cannot find 'Save' button",
+                5);
+
+        waitForElementAndClick(By.xpath("//*[contains(@text, 'ADD TO LIST')]"),
+                "Cannot find 'Save' button",
+                5);
+
+        waitForElementAndSendKeys(By.id("org.wikipedia:id/text_input"),
+                "Learning Programming",
+                "cannot find text input field",
+                5);
+        waitForElementAndClick(By.xpath("//*[contains(@text, 'OK')]"),
+                "Cannot find 'OK' button",
+                5);
+
+        waitForElementAndClick(By.xpath("//android.widget.ImageButton[@content-desc='Navigate up']"),
+                "Cannot close article",
+                5);
+
+        waitForElementAndClick(By.xpath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout[1]/android.view.ViewGroup/android.widget.ImageButton"),
+                "Cannot close article",
+                5);
+
+        waitForElementAndClick(By.xpath("//*[contains(@text, 'Saved')]"),
+                "Cannot find 'Saved' button",
+                5);
+
+        waitForElementAndClick(By.xpath("//*[contains(@text, 'Learning Programming')]"),
+                "Cannot find 'Learning Programming' list",
+                5);
+
+        swipeElementToLeft(By.xpath("//*[contains(@text, 'Learning Programming')]"),
+                "Cannot find 'Learning Programming' topic");
+
+        waitForElementNotPresent( By.xpath("//*[contains(@text, 'Java (programming language)')]"),
+                "Cannot delete saved article",
+                5);
+
+    }
+
     private WebElement waitForElementPresent(By by, String error_message, long timeoutInSeconds) {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
         wait.withMessage(error_message + "\n");
@@ -207,7 +275,12 @@ public class FirstTest {
         int start_y = (int) (size.height * 0.8);
         int end_y = (int) (size.height * 0.2);
 
-        action.press(x, start_y).waitAction(timeOfSwipe).moveTo(x, end_y).release().perform();
+        action
+                .press(x, start_y)
+                .waitAction(timeOfSwipe)
+                .moveTo(x, end_y)
+                .release()
+                .perform();
     }
 
     protected void swipeUpQuick(){
@@ -224,5 +297,24 @@ public class FirstTest {
             swipeUpQuick();
             ++already_swiped;
         }
+    }
+
+    protected void swipeElementToLeft(By by, String error_message){
+
+        WebElement element = waitForElementPresent (by, error_message, 5);
+        int left_x = element.getLocation().getX();
+        int right_x = left_x + element.getSize().getWidth();
+        int upper_y = element.getLocation().getY();
+        int lower_y = upper_y + element.getSize().getHeight();
+        int middle_y = (upper_y + lower_y) / 2;
+
+        TouchAction action = new TouchAction(driver);
+        action
+                .press(right_x, middle_y)
+                .waitAction(150)
+                .moveTo(left_x, middle_y)
+                .release()
+                .perform();
+
     }
 }
